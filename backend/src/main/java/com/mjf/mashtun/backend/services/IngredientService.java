@@ -40,8 +40,8 @@ public class IngredientService {
     }
 
     @Transactional
-    public IngredientDTO createIngredient(IngredientDTO ingredientDTO){
-        return ingredientDAO.create(ingredientDTO);
+    public void createIngredient(List<IngredientDTO> ingredientDTO){
+        ingredientDAO.create(ingredientDTO);
     }
 
     @Transactional

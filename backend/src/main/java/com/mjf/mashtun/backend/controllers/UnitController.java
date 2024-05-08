@@ -1,6 +1,5 @@
 package com.mjf.mashtun.backend.controllers;
 
-import com.mjf.mashtun.backend.dtos.IngredientDTO;
 import com.mjf.mashtun.backend.dtos.UnitDTO;
 import com.mjf.mashtun.backend.services.UnitService;
 import lombok.AllArgsConstructor;
@@ -26,15 +25,16 @@ public class UnitController {
     }
 
     @PostMapping("/unit")
-    public UnitDTO createUnit(@RequestBody UnitDTO unitDTO){
-        return unitService.createUnit(unitDTO);
+    public ResponseEntity<String> createUnit(@RequestBody List<UnitDTO> unitDTOs){
+        unitService.createUnits(unitDTOs);
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/unit/{id}")
     public ResponseEntity<UnitDTO> updateUnit(@RequestBody UnitDTO unitDTO, @PathVariable long id){
         UnitDTO unitToUpdate = unitService.getUnitsById(id);
         if(unitToUpdate != null){
-            unitToUpdate.setUnitLabel(unitDTO.getUnitLabel());
+            unitToUpdate.setUnit_label(unitDTO.getUnit_label());
             unitService.updateUnit(unitToUpdate);
             return ResponseEntity.ok(unitToUpdate);
         }

@@ -22,10 +22,8 @@ public class RecipeIngredientController {
 
     @PostMapping("/recipeIngredient")
     public ResponseEntity<String> createRecipeIngredient (@RequestBody List<RecipeIngredientDTO> recipeIngredientDTO){
-        int rows = recipeIngredientService.createRecipeIngredient(recipeIngredientDTO);
-        if(rows > 0)
-            return ResponseEntity.status(HttpStatus.CREATED).build();
-        return ResponseEntity.badRequest().build();
+        recipeIngredientService.createRecipeIngredient(recipeIngredientDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
 

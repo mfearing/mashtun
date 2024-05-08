@@ -2,8 +2,6 @@ package com.mjf.mashtun.backend.daos;
 
 import com.mjf.mashtun.backend.dtos.RecipeDTO;
 import com.mjf.mashtun.backend.exceptions.AppException;
-import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
@@ -11,8 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
@@ -37,7 +33,7 @@ public class JdbcRecipeDAO implements RecipeDAO {
             return jdbcTemplate.query(sql, new MapSqlParameterSource(), new RecipeDTORowMapper());
         } catch (DataAccessException e){
             logger.debug(e.getMessage());
-            throw new AppException("Error in Recipe.findAll()", HttpStatus.BAD_REQUEST);
+            throw new AppException(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -51,38 +47,39 @@ public class JdbcRecipeDAO implements RecipeDAO {
             return jdbcTemplate.queryForObject(sql, params, new RecipeDTORowMapper());
         } catch (DataAccessException e){
             logger.debug(e.getMessage());
-            throw new AppException("Error in Recipe.findById()", HttpStatus.BAD_REQUEST);
+            throw new AppException(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
     @Override
-    public RecipeDTO findByName(String name) {
-        String sql = "select * from recipe where name = :name";
+    public RecipeDTO findByRecipeLabel(String recipe_label) {
+        String sql = "select * from recipe where recipe_label = :recipe_label";
         MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("name", name);
+        params.addValue("recipe_label", recipe_label);
 
         try{
             return jdbcTemplate.queryForObject(sql, params, new RecipeDTORowMapper());
         } catch (DataAccessException e){
             logger.debug(e.getMessage());
-            throw new AppException("Error in Recipe.findByName()", HttpStatus.BAD_REQUEST);
+            throw new AppException(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
     @Override
-    public RecipeDTO create(RecipeDTO recipeDTO) {
-        String sql = "insert into recipe (name, description, instructions) values (:name, :description, :instructions)";
-        MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("name", recipeDTO.getName());
-        params.addValue("description", recipeDTO.getDescription());
-        params.addValue("instructions", recipeDTO.getInstructions());
-        KeyHolder keyHolder = new GeneratedKeyHolder();
+    public void create(List<RecipeDTO> recipeDTOs) {
+        String sql = "insert into recipe (recipe_label, description, instructions) values (:recipe_label, :description, :instructions)";
+        MapSqlParameterSource[] batchParams = new MapSqlParameterSource[recipeDTOs.size()];
+
+        for(int i = 0; i < recipeDTOs.size(); i++) {
+            MapSqlParameterSource param = new MapSqlParameterSource();
+            param.addValue("recipe_label", recipeDTOs.get(i).getRecipe_label());
+            param.addValue("description", recipeDTOs.get(i).getDescription());
+            param.addValue("instructions", recipeDTOs.get(i).getInstructions());
+            batchParams[i] = param;
+        }
 
         try{
-            jdbcTemplate.update(sql, params, keyHolder);
-            long newId = Long.parseLong(String.valueOf(keyHolder.getKeyList().get(0).get("id")));
-            recipeDTO.setId(newId);
-            return recipeDTO;
+            jdbcTemplate.batchUpdate(sql, batchParams);
         } catch (DataAccessException e){
             logger.debug(e.getMessage());
             throw new AppException("Error creating recipe, check logs.", HttpStatus.BAD_REQUEST);
@@ -91,9 +88,9 @@ public class JdbcRecipeDAO implements RecipeDAO {
 
     @Override
     public int update(RecipeDTO recipeDTO) {
-        String sql = "update recipe set name = :name, description = :description, instructions = :instructions where id = :id";
+        String sql = "update recipe set recipe_label = :recipe_label, description = :description, instructions = :instructions where id = :id";
         MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("name", recipeDTO.getName());
+        params.addValue("recipe_label", recipeDTO.getRecipe_label());
         params.addValue("description", recipeDTO.getDescription());
         params.addValue("instructions", recipeDTO.getInstructions());
         params.addValue("id", recipeDTO.getId());
@@ -128,7 +125,7 @@ public class JdbcRecipeDAO implements RecipeDAO {
             RecipeDTO recipeDTO = new RecipeDTO();
 
             recipeDTO.setId(rs.getLong("id"));
-            recipeDTO.setName(rs.getString("name"));
+            recipeDTO.setRecipe_label(rs.getString("recipe_label"));
             recipeDTO.setDescription(rs.getString("description"));
             recipeDTO.setInstructions(rs.getString("instructions"));
 

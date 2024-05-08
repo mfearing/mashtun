@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS public.app_user;
+drop table IF exists public.app_user;
 drop table if exists public.recipe_ingredient;
 drop table if exists public.unit;
 drop table if exists public.ingredient;
@@ -9,7 +9,7 @@ drop index if exists unit_label_uk;
 
 CREATE TABLE IF NOT EXISTS public.recipe (
   id    serial not null primary key,
-  name         character varying(100) COLLATE pg_catalog."default" NOT NULL,
+  recipe_label character varying(100) COLLATE pg_catalog."default" NOT NULL,
   description  TEXT,
   instructions TEXT
 );

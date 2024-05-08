@@ -8,7 +8,7 @@ public interface UnitDAO {
     List<UnitDTO> findAll();
     UnitDTO findById(long id);
     UnitDTO findByUnitLabel(String label);
-    UnitDTO create(UnitDTO unitDTO);
+    void create(List<UnitDTO> unitDTOs);
     int update(UnitDTO unitDTO);
     int delete(long id);
 }

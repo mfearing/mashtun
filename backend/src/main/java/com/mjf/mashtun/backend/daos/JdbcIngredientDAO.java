@@ -1,14 +1,14 @@
 package com.mjf.mashtun.backend.daos;
 
 import com.mjf.mashtun.backend.dtos.IngredientDTO;
+import com.mjf.mashtun.backend.exceptions.AppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
@@ -81,29 +81,30 @@ public class JdbcIngredientDAO implements IngredientDAO {
     }
 
     @Override
-    public IngredientDTO create(IngredientDTO ingredientDTO) {
+    public void create(List<IngredientDTO> ingredientDTOs) {
         String sql = "insert into ingredient (ingredient_label) values (:ingredient_label)";
-        MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("ingredient_label", ingredientDTO.getIngredientLabel());
-        KeyHolder keyHolder = new GeneratedKeyHolder();
 
-        try{
-            jdbcTemplate.update(sql, params, keyHolder);
-            long newId = Long.parseLong(String.valueOf(keyHolder.getKeyList().get(0).get("id")));
-            ingredientDTO.setId(newId);
-            return ingredientDTO;
-        } catch (DataAccessException e){
-            logger.debug(e.getMessage());
+        MapSqlParameterSource[] batchParams = new MapSqlParameterSource[ingredientDTOs.size()];
+
+        for(int i = 0; i < ingredientDTOs.size(); i++){
+            MapSqlParameterSource param = new MapSqlParameterSource();
+            param.addValue("ingredient_label", ingredientDTOs.get(i).getIngredient_label());
+            batchParams[i] = param;
         }
 
-        return null;
+        try{
+            jdbcTemplate.batchUpdate(sql, batchParams);
+        } catch (DataAccessException e){
+            logger.debug(e.getMessage());
+            throw new AppException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Override
     public int update(IngredientDTO ingredientDTO) {
         String sql = "update ingredient set ingredient_label = :ingredient_label where id = :id";
         MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("ingredient_label", ingredientDTO.getIngredientLabel());
+        params.addValue("ingredient_label", ingredientDTO.getIngredient_label());
         params.addValue("id", ingredientDTO.getId());
 
         try{
@@ -137,7 +138,7 @@ public class JdbcIngredientDAO implements IngredientDAO {
         public IngredientDTO mapRow(ResultSet rs, int rowNum) throws SQLException {
             IngredientDTO result = new IngredientDTO();
             result.setId(rs.getLong("id"));
-            result.setIngredientLabel(rs.getString("ingredient_label"));
+            result.setIngredient_label(rs.getString("ingredient_label"));
             return result;
         }
     }

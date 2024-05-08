@@ -9,7 +9,7 @@ public interface IngredientDAO {
     List<IngredientDTO> findAllPaginated(int pageNumber, int pageSize);
     IngredientDTO findById(long id);
     IngredientDTO findByIngredientLabel(String label);
-    IngredientDTO create(IngredientDTO ingredientDTO);
+    void create(List<IngredientDTO> ingredientDTO);
     int update(IngredientDTO ingredientDTO);
     int delete(long id);
 }
