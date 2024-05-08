@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 @Builder
 public class UnitDTO {
     private long id;
-    private String unitLabel;
+    private String unit_label;
 }

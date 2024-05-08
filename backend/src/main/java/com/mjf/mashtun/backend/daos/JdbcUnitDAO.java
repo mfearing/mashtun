@@ -1,16 +1,14 @@
 package com.mjf.mashtun.backend.daos;
 
-import com.mjf.mashtun.backend.dtos.IngredientDTO;
 import com.mjf.mashtun.backend.dtos.UnitDTO;
-import lombok.RequiredArgsConstructor;
+import com.mjf.mashtun.backend.exceptions.AppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
@@ -71,29 +69,30 @@ public class JdbcUnitDAO implements UnitDAO {
     }
 
     @Override
-    public UnitDTO create(UnitDTO unitDTO) {
+    public void create(List<UnitDTO> unitDTOs) {
         String sql = "insert into unit (unit_label) values (:unit_label)";
-        MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("unit_label", unitDTO.getUnitLabel());
-        KeyHolder keyHolder = new GeneratedKeyHolder();
 
-        try{
-            jdbcTemplate.update(sql, params, keyHolder);
-            long newId = Long.parseLong(String.valueOf(keyHolder.getKeyList().get(0).get("id")));
-            unitDTO.setId(newId);
-            return unitDTO;
-        } catch (DataAccessException e){
-            logger.debug(e.getMessage());
+        MapSqlParameterSource[] batchParams = new MapSqlParameterSource[unitDTOs.size()];
+
+        for(int i = 0; i < unitDTOs.size(); i++){
+            MapSqlParameterSource param = new MapSqlParameterSource();
+            param.addValue("unit_label", unitDTOs.get(i).getUnit_label());
+            batchParams[i] = param;
         }
 
-        return null;
+        try{
+            jdbcTemplate.batchUpdate(sql, batchParams);
+        } catch (DataAccessException e){
+            logger.debug(e.getMessage());
+            throw new AppException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Override
     public int update(UnitDTO unitDTO) {
         String sql = "update unit set unit_label = :unit_label where id = :id";
         MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("unit_label", unitDTO.getUnitLabel());
+        params.addValue("unit_label", unitDTO.getUnit_label());
         params.addValue("id", unitDTO.getId());
 
         try{
@@ -127,7 +126,7 @@ public class JdbcUnitDAO implements UnitDAO {
         public UnitDTO mapRow(ResultSet rs, int rowNum) throws SQLException {
             UnitDTO result = new UnitDTO();
             result.setId(rs.getLong("id"));
-            result.setUnitLabel(rs.getString("unit_label"));
+            result.setUnit_label(rs.getString("unit_label"));
             return result;
         }
     }

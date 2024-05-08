@@ -1,11 +1,9 @@
 package com.mjf.mashtun.backend.services;
 
 import com.mjf.mashtun.backend.daos.UnitDAO;
-import com.mjf.mashtun.backend.dtos.IngredientDTO;
 import com.mjf.mashtun.backend.dtos.UnitDTO;
 import com.mjf.mashtun.backend.exceptions.AppException;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
@@ -35,8 +33,8 @@ public class UnitService {
     }
 
     @Transactional
-    public UnitDTO createUnit(UnitDTO unitDTO){
-        return unitDAO.create(unitDTO);
+    public void createUnits(List<UnitDTO> unitDTOs){
+        unitDAO.create(unitDTOs);
     }
 
     @Transactional

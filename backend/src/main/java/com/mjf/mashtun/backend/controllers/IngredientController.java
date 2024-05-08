@@ -28,15 +28,16 @@ public class IngredientController {
     }
 
     @PostMapping("/ingredient")
-    public IngredientDTO createIngredient(@RequestBody IngredientDTO ingredientDTO){
-        return ingredientService.createIngredient(ingredientDTO);
+    public ResponseEntity<String> createIngredient(@RequestBody List<IngredientDTO> ingredientDTO){
+        ingredientService.createIngredient(ingredientDTO);
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/ingredient/{id}")
     public ResponseEntity<IngredientDTO> updateIngredient(@RequestBody IngredientDTO ingredientDTO, @PathVariable long id){
         IngredientDTO ingredientToUpdate = ingredientService.getIngredientById(id);
         if(ingredientToUpdate != null){
-            ingredientToUpdate.setIngredientLabel(ingredientDTO.getIngredientLabel());
+            ingredientToUpdate.setIngredient_label(ingredientDTO.getIngredient_label());
             ingredientService.updateIngredient(ingredientToUpdate);
             return ResponseEntity.ok(ingredientToUpdate);
         }

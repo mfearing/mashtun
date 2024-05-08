@@ -7,8 +7,8 @@ import java.util.List;
 public interface RecipeDAO {
     List<RecipeDTO> findAll();
     RecipeDTO findById(long id);
-    RecipeDTO findByName(String name);
-    RecipeDTO create(RecipeDTO recipeDTO);
+    RecipeDTO findByRecipeLabel(String name);
+    void create(List<RecipeDTO> recipeDTO);
     int update(RecipeDTO recipeDTO);
     int delete(long id);
 }

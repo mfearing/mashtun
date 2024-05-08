@@ -25,19 +25,18 @@ public class RecipeController {
     }
 
     @PostMapping("/recipe")
-    public RecipeDTO createRecipe(@RequestBody RecipeDTO recipeDTO){
-        return recipeService.createRecipe(recipeDTO);
+    public ResponseEntity<String> createRecipe(@RequestBody List<RecipeDTO> recipeDTO){
+        recipeService.createRecipe(recipeDTO);
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/recipe/{id}")
     public ResponseEntity<RecipeDTO> updateRecipe(@RequestBody RecipeDTO recipeDTO, @PathVariable long id){
         RecipeDTO recipeToUpdate = recipeService.getRecipeById(id);
         if(recipeToUpdate != null){
-            recipeToUpdate = RecipeDTO.builder()
-                .id(recipeDTO.getId())
-                .name(recipeDTO.getName())
-                .description(recipeDTO.getDescription())
-                .instructions(recipeDTO.getInstructions()).build();
+            recipeToUpdate.setRecipe_label(recipeDTO.getRecipe_label());
+            recipeToUpdate.setDescription(recipeDTO.getDescription());
+            recipeToUpdate.setInstructions(recipeDTO.getInstructions());
             recipeService.updateRecipe(recipeToUpdate);
             return ResponseEntity.ok(recipeToUpdate);
         }

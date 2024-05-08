@@ -27,13 +27,13 @@ public class RecipeService {
         return recipeDAO.findById(id);
     }
 
-    public RecipeDTO getRecipeByName(String name){
-        return recipeDAO.findByName(name);
+    public RecipeDTO getRecipeByRecipeLabel(String recipe_label){
+        return recipeDAO.findByRecipeLabel(recipe_label);
     }
 
     @Transactional
-    public RecipeDTO createRecipe(RecipeDTO recipeDTO){
-        return recipeDAO.create(recipeDTO);
+    public void createRecipe(List<RecipeDTO> recipeDTO){
+        recipeDAO.create(recipeDTO);
     }
 
     @Transactional
