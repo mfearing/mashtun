@@ -5,6 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
 import com.mjf.mashtun.backend.dtos.UserDTO;
+import com.mjf.mashtun.backend.enums.Role;
 import com.mjf.mashtun.backend.services.UserService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -46,8 +47,9 @@ public class UserAuthenticationProvider {
                 .withSubject(user.getLogin())
                 .withIssuedAt(now)
                 .withExpiresAt(validity)
-                .withClaim("firstName", user.getFirstName())
-                .withClaim("lastName", user.getLastName())
+                //.withClaim("firstName", user.getFirstName())
+                //.withClaim("lastName", user.getLastName())
+                .withClaim("role", user.getRole().name())
                 .sign(algorithm);
     }
 
@@ -59,9 +61,10 @@ public class UserAuthenticationProvider {
                 .login(decoded.getSubject())
                 .firstName(decoded.getClaim("firstName").asString())
                 .lastName(decoded.getClaim("lastName").asString())
+                .role(Role.valueOf(decoded.getClaim("role").asString()))
                 .build();
 
-        return new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
+        return new UsernamePasswordAuthenticationToken(user, null, Collections.singletonList(user.getRole()));
     }
 
     public Authentication validateTokenStrongly(String token){
