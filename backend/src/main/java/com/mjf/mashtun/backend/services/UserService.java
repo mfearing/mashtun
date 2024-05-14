@@ -4,6 +4,7 @@ import com.mjf.mashtun.backend.daos.UserDAO;
 import com.mjf.mashtun.backend.dtos.CredentialsDTO;
 import com.mjf.mashtun.backend.dtos.SignUpDTO;
 import com.mjf.mashtun.backend.dtos.UserDTO;
+import com.mjf.mashtun.backend.enums.Role;
 import com.mjf.mashtun.backend.exceptions.AppException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -48,6 +49,7 @@ public class UserService {
         userDTO.setEmail(signUpDto.email());
         userDTO.setLogin(signUpDto.login());
         userDTO.setPassword(passwordEncoder.encode(CharBuffer.wrap(signUpDto.password())));
+        userDTO.setRole(Role.USER); //default to user
 
         if(userDAO.create(userDTO) != null){
             return userDTO;

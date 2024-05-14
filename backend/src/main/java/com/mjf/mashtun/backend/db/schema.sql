@@ -41,5 +41,6 @@ CREATE TABLE IF NOT EXISTS public.app_user
     first_name character varying(100) COLLATE pg_catalog."default" NOT NULL,
     last_name character varying(100) COLLATE pg_catalog."default" NOT NULL,
     login character varying(100) COLLATE pg_catalog."default" NOT NULL,
-    password character varying(100) COLLATE pg_catalog."default" NOT NULL
+    password character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    role character varying(50) COLLATE pg_catalog."default" NOT NULL
 );
